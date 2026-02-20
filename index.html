@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>I Got Love — Андрей Шевченко</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #0d0b09;
+            --accent-gold: #c8922a;
+            --accent-cream: #e8dcc8;
+            --text-main: #d4c8b0;
+            --text-secondary: #6b5e4a;
+            --text-dim: #4a3f2f;
+            --footer-text: #3a3028;
+            --glow: rgba(200, 146, 42, 0.15);
+            --glow-strong: rgba(200, 146, 42, 0.4);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Custom Scrollbar */
+        html {
+            scroll-behavior: smooth;
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent-gold) var(--bg-deep);
+        }
+
+        html::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        html::-webkit-scrollbar-track {
+            background: var(--bg-deep);
+        }
+
+        html::-webkit-scrollbar-thumb {
+            background: var(--accent-gold);
+            border-radius: 3px;
+        }
+
+        html::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-cream);
+        }
+
+        /* Cursor */
+        body, .play-btn, .control-btn, .progress-bar, .volume-slider, .scroll-hint, .volume-icon {
+            cursor: pointer;
+        }
+
+        body {
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            min-height: 100vh;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* Grain Overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0.04;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+        }
+
+        /* Vignette */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9998;
+            background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.6) 100%);
+        }
+
+        /* Vinyl Scratch */
+        .vinyl-scratch {
+            position: fixed;
+            top: -2px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent 0%, rgba(200,146,42,0.3) 20%, rgba(200,146,42,0.4) 50%, rgba(200,146,42,0.3) 80%, transparent 100%);
+            z-index: 9997;
+            opacity: 0;
+            animation: scratch 8s ease-in-out infinite;
+        }
+
+        @keyframes scratch {
+            0% { top: -2px; opacity: 0; }
+            10% { opacity: 0.3; }
+            90% { opacity: 0.3; }
+            100% { top: 102vh; opacity: 0; }
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            padding: 2rem;
+        }
+
+        /* Pulsing Glow Circle */
+        .hero-glow {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--glow) 0%, transparent 70%);
+            animation: pulse 6s ease-in-out infinite;
+            z-index: -1;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.6; }
+            50% { transform: scale(1.08); opacity: 0.8; }
+        }
+
+        .hero-content {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 1s ease-out forwards;
+        }
+
+        .hero-title {
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-size: clamp(3rem, 12vw, 7rem);
+            font-weight: 300;
+            font-style: italic;
+            letter-spacing: 0.15em;
+            color: var(--accent-cream);
+            text-shadow: 0 0 60px var(--glow);
+            margin-bottom: 1rem;
+        }
+
+        .hero-artist {
+            font-family: 'DM Mono', monospace;
+            font-size: clamp(0.9rem, 2vw, 1.1rem);
+            font-weight: 300;
+            color: var(--text-secondary);
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+            opacity: 0;
+            animation: fadeInUp 1s ease-out 0.3s forwards;
+        }
+
+        .hero-meta {
+            font-family: 'DM Mono', monospace;
+            font-size: 0.7rem;
+            font-weight: 300;
+            color: var(--text-dim);
+            letter-spacing: 0.4em;
+            opacity: 0;
+            animation: fadeInUp 1s ease-out 0.5s forwards;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .scroll-hint {
+            position: absolute;
+            bottom: 3rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            opacity: 0;
+            animation: fadeInUp 1s ease-out 0.8s forwards;
+        }
+
+        .scroll-hint span {
+            font-family: 'DM Mono', monospace;
+            font-size: 0.65rem;
+            color: var(--text-dim);
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+        }
+
+        .scroll-arrow {
+            width: 20px;
+            height: 20px;
+            border-right: 1px solid var(--accent-gold);
+            border-bottom: 1px solid var(--accent-gold);
+            transform: rotate(45deg);
+            animation: blink 2s ease-in-out infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.8; }
+        }
+
+        /* Player Section */
+        .player-section {
+            padding: 4rem 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .player-container {
+            background: rgba(13, 11, 9, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(200, 146, 42, 0.3);
+            border-radius: 20px;
+            padding: 2rem;
+            width: 100%;
+            max-width: 600px;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 1s ease-out 0.3s forwards;
+        }
+
+        .player-header {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .album-art {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-gold) 0%, #1a1510 50%, var(--accent-gold) 100%);
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            box-shadow: 0 0 30px var(--glow);
+        }
+
+        .album-art::before {
+            content: '';
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: var(--bg-deep);
+            border: 2px solid var(--accent-gold);
+        }
+
+        .album-art.spinning {
+            animation: spin 8s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .track-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .track-title {
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-size: 1.4rem;
+            font-weight: 400;
+            font-style: italic;
+            color: var(--accent-cream);
+            margin-bottom: 0.3rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .track-artist {
+            font-family: 'DM Mono', monospace;
+            font-size: 0.75rem;
+            font-weight: 300;
+            color: var(--text-secondary);
+            letter-spacing: 0.15em;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            margin-bottom: 1rem;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: rgba(107, 94, 74, 0.3);
+            border-radius: 2px;
+            cursor: pointer;
+            position: relative;
+            transition: height 0.2s ease;
+        }
+
+        .progress-bar:hover {
+            height: 6px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--accent-gold);
+            border-radius: 2px;
+            width: 0%;
+            position: relative;
+            transition: width 0.1s linear;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            right: -6px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--accent-gold);
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .progress-bar:hover .progress-fill::after {
+            opacity: 1;
+        }
+
+        .time-display {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 0.5rem;
+            font-family: 'DM Mono', monospace;
+            font-size: 0.65rem;
+            color: var(--text-dim);
+            letter-spacing: 0.1em;
+        }
+
+        /* Visualizer */
+        .visualizer {
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            gap: 2px;
+            height: 40px;
+            margin-bottom: 1.5rem;
+        }
+
+        .visualizer-bar {
+            width: 4px;
+            background: var(--accent-gold);
+            border-radius: 2px;
+            transition: height 0.05s ease;
+            opacity: 0.7;
+        }
+
+        /* Player Controls */
+        .player-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1.5rem;
+        }
+
+        .control-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-main);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .control-btn svg {
+            width: 24px;
+            height: 24px;
+            fill: currentColor;
+        }
+
+        .skip-btn {
+            color: var(--text-secondary);
+        }
+
+        .skip-btn:hover {
+            color: var(--accent-gold);
+        }
+
+        .skip-btn svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .play-btn {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            border: 1px solid var(--accent-gold);
+            background: transparent;
+            color: var(--accent-cream);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .play-btn:hover {
+            box-shadow: 0 0 25px var(--glow-strong);
+            background: rgba(200, 146, 42, 0.1);
+        }
+
+        .play-btn svg {
+            width: 28px;
+            height: 28px;
+            fill: currentColor;
+        }
+
+        /* Volume Control */
+        .volume-container {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            justify-content: center;
+        }
+
+        .volume-icon {
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+
+        .volume-icon svg {
+            width: 18px;
+            height: 18px;
+            fill: currentColor;
+        }
+
+        .volume-slider {
+            width: 80px;
+            height: 4px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: rgba(107, 94, 74, 0.3);
+            border-radius: 2px;
+            outline: none;
+        }
+
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--accent-gold);
+            cursor: pointer;
+        }
+
+        .volume-slider::-moz-range-thumb {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--accent-gold);
+            cursor: pointer;
+            border: none;
+        }
+
+        /* Lyrics Section */
+        .lyrics-section {
+            padding: 4rem 2rem 8rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .lyrics-section h2 {
+            font-family: 'DM Mono', monospace;
+            font-size: 0.7rem;
+            font-weight: 300;
+            color: var(--text-dim);
+            letter-spacing: 0.4em;
+            text-transform: uppercase;
+            text-align: center;
+            margin-bottom: 3rem;
+            opacity: 0;
+            animation: fadeInUp 1s ease-out 0.3s forwards;
+        }
+
+        .lyrics-block {
+            opacity: 0;
+            transform: translateY(15px);
+            transition: all 0.8s ease-out;
+        }
+
+        .lyrics-block.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .section-label {
+            font-family: 'DM Mono', monospace;
+            font-size: 0.65rem;
+            font-weight: 400;
+            color: var(--text-secondary);
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            margin-top: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .lyric-line {
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-size: 1.15rem;
+            font-weight: 300;
+            color: var(--text-main);
+            line-height: 1.9;
+            margin-bottom: 0.3rem;
+        }
+
+        .lyric-line.english {
+            font-size: 1.2rem;
+            letter-spacing: 0.08em;
+            color: var(--accent-cream);
+        }
+
+        .lyric-line.highlight {
+            color: var(--accent-gold);
+            text-shadow: 0 0 20px var(--glow);
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            border-top: 1px solid rgba(107, 94, 74, 0.2);
+        }
+
+        .footer p {
+            font-family: 'DM Mono', monospace;
+            font-size: 0.65rem;
+            font-weight: 300;
+            color: var(--footer-text);
+            letter-spacing: 0.15em;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 640px) {
+            .player-container {
+                padding: 1.5rem;
+            }
+
+            .player-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .album-art {
+                margin: 0 auto;
+            }
+
+            .track-info {
+                text-align: center;
+            }
+
+            .player-controls {
+                gap: 1rem;
+            }
+
+            .play-btn {
+                width: 56px;
+                height: 56px;
+            }
+
+            .lyrics-section {
+                padding: 3rem 1.5rem 6rem;
+            }
+
+            .lyric-line {
+                font-size: 1rem;
+            }
+
+            .lyric-line.english {
+                font-size: 1.05rem;
+            }
+
+            .hero-glow {
+                width: 300px;
+                height: 300px;
+            }
+        }
+
+        /* Hidden audio element for reference */
+        .audio-source {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Vinyl Scratch Animation -->
+    <div class="vinyl-scratch"></div>
+
+    <!-- Hero Section -->
+    <section class="hero" id="hero">
+        <div class="hero-glow"></div>
+        <div class="hero-content">
+            <h1 class="hero-title">I GOT LOVE</h1>
+            <p class="hero-artist">Андрей Шевченко</p>
+            <p class="hero-meta">Ragga Hip-Hop · 106 BPM · F# Minor</p>
+        </div>
+        <div class="scroll-hint" onclick="scrollToPlayer()">
+            <span>Scroll</span>
+            <div class="scroll-arrow"></div>
+        </div>
+    </section>
+
+    <!-- Player Section -->
+    <section class="player-section" id="player">
+        <div class="player-container">
+            <div class="player-header">
+                <div class="album-art" id="albumArt"></div>
+                <div class="track-info">
+                    <div class="track-title">I Got Love</div>
+                    <div class="track-artist">Андрей Шевченко</div>
+                </div>
+            </div>
+
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="time-display">
+                    <span id="currentTime">0:00</span>
+                    <span id="totalTime">0:00</span>
+                </div>
+            </div>
+
+            <div class="visualizer" id="visualizer"></div>
+
+            <div class="player-controls">
+                <button class="control-btn skip-btn" onclick="skip(-10)" title="-10 сек">
+                    <svg viewBox="0 0 24 24"><path d="M12.5 3C17.15 3 21.08 6.03 22.45 10.22L20 11C18.87 7.63 15.95 5.25 12.5 5.25C10.54 5.25 8.77 5.97 7.38 7.17L10 9.8H7V14.2L4 11.2V3H12.5z"/><text x="12" y="14" font-size="6" text-anchor="middle" fill="currentColor">10</text></svg>
+                </button>
+                <button class="play-btn" id="playBtn" onclick="togglePlay()">
+                    <svg id="playIcon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    <svg id="pauseIcon" viewBox="0 0 24 24" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                </button>
+                <button class="control-btn skip-btn" onclick="skip(10)" title="+10 сек">
+                    <svg viewBox="0 0 24 24"><path d="M11.5 3C6.85 3 2.92 6.03 1.55 10.22L4 11C5.13 7.63 8.05 5.25 11.5 5.25C13.46 5.25 15.23 5.97 16.62 7.17L14 9.8H17V14.2L20 11.2V3H11.5z"/><text x="12" y="14" font-size="6" text-anchor="middle" fill="currentColor">10</text></svg>
+                </button>
+            </div>
+
+            <div class="volume-container">
+                <div class="volume-icon" onclick="toggleMute()">
+                    <svg id="volumeIcon" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+                </div>
+                <input type="range" class="volume-slider" id="volumeSlider" min="0" max="1" step="0.01" value="0.7">
+            </div>
+        </div>
+    </section>
+
+    <!-- Lyrics Section -->
+    <section class="lyrics-section">
+        <h2>Текст песни</h2>
+
+        <div class="lyrics-block" data-section="intro">
+            <div class="section-label">[Intro]</div>
+
+            <p class="lyric-line">«I got love...»</p>
+        </div>
+
+        <div class="lyrics-block" data-section="verse1">
+            <div class="section-label">[Verse 1: MiyaGi]</div>
+
+            <p class="lyric-line">Окутала меня, окутала.</p>
+            <p class="lyric-line">Ты будто мой сорт — мариуанна.</p>
+            <p class="lyric-line">Небо в алмазах — лето летало.</p>
+            <p class="lyric-line">Ты моя бэйби — дочь карнавала.</p>
+            <p class="lyric-line">Двигайся крошка, принцесса бала.</p>
+            <p class="lyric-line">Ночь перемен — мысли растамана.</p>
+            <p class="lyric-line">Пока не устал — музыка играла.</p>
+            <p class="lyric-line">Кто-то курил — кого-то впирало!</p>
+
+            <p class="lyric-line">Эта дура дуремара, а нам она.</p>
+            <p class="lyric-line">Было думал, улетала в теплые края.</p>
+            <p class="lyric-line">Лето, море, песок, но мне тебя мало.</p>
+            <p class="lyric-line">Танцую в пол — руки в потолок зала.</p>
+            <p class="lyric-line">Туда куда пал больше не вернусь.</p>
+            <p class="lyric-line">Чудом умотал и забрал с ней грусть.</p>
+            <p class="lyric-line">Это наша жизнь и ей всегда мало.</p>
+            <p class="lyric-line">Танцую в пол — руки в потолок зала.</p>
+
+            <p class="lyric-line">Go everybody shake your ass, go!</p>
+            <p class="lyric-line">Move everybody моё — любимое шоу.</p>
+            <p class="lyric-line">Голова качала, бачата давала маннама.</p>
+            <p class="lyric-line">Блавовал планна в налы навара.</p>
+            <p class="lyric-line">Бутора валом подавай нам!</p>
+            <p class="lyric-line">Когда будет этот день — ты пой про себя.</p>
+            <p class="lyric-line">Про меня, за любовь, за маму, за брата,</p>
+            <p class="lyric-line">А то судьба загнет ата-ата!</p>
+        </div>
+
+        <div class="lyrics-block" data-section="chorus1">
+            <div class="section-label">[Chorus]</div>
+
+            <p class="lyric-line english">I got love a feel.</p>
+            <p class="lyric-line english">I got you my mind.</p>
+            <p class="lyric-line english">I got love my skill.</p>
+            <p class="lyric-line english">My la-la-la-love.</p>
+            <p class="lyric-line english">I got love a feel.</p>
+            <p class="lyric-line english">I got you my mind.</p>
+            <p class="lyric-line english">I got love my skill.</p>
+            <p class="lyric-line english">My la-la-la-love.</p>
+        </div>
+
+        <div class="lyrics-block" data-section="verse2">
+            <div class="section-label">[Verse 2: Эндшпиль]</div>
+
+            <p class="lyric-line">Окна завесим, будем опять принцесса и деспот.</p>
+            <p class="lyric-line">Лаврами не взять твой пыл, куралесим.</p>
+            <p class="lyric-line">Мы на волю по годам сорвемся вместе.</p>
+            <p class="lyric-line english">(У-а! У-а!)</p>
+
+            <p class="lyric-line">За мгновение облететь планеты ни по чем,</p>
+            <p class="lyric-line">То барабанит дождь — тоска да печаль.</p>
+            <p class="lyric-line">Но ты светом добра озарила свободу,</p>
+            <p class="lyric-line">В танце двигали бёдра.</p>
+            <p class="lyric-line">Ты моя румба, ты моя самба,</p>
+            <p class="lyric-line">Ты моя сальса, ты мое танго.</p>
+            <p class="lyric-line">Дыма навали, Volume наболтай,</p>
+            <p class="lyric-line">В этих объятиях со мною летай.</p>
+
+            <p class="lyric-line">Со мною летай, со мною летай.</p>
+            <p class="lyric-line">Со мною летай, со мною летай.</p>
+            <p class="lyric-line">Дыма навали, Volume наболтай,</p>
+            <p class="lyric-line">В этих объятиях со мною летай.</p>
+        </div>
+
+        <div class="lyrics-block" data-section="chorus2">
+            <div class="section-label">[Chorus]</div>
+
+            <p class="lyric-line english">I got love a feel.</p>
+            <p class="lyric-line english">I got you my mind.</p>
+            <p class="lyric-line english">I got love my skill.</p>
+            <p class="lyric-line english">My la-la-la-love.</p>
+        </div>
+
+        <div class="lyrics-block" data-section="verse3">
+            <div class="section-label">[Verse 3: Рем Дигга]</div>
+
+            <p class="lyric-line">Это всего лишь игра может быть наверно,</p>
+            <p class="lyric-line">Даже твоя нагота.</p>
+            <p class="lyric-line">Воу, детка, я не верю, но падай в руки ко мне, моя красота.</p>
+            <p class="lyric-line">Мы с тобою без гида — так надо,</p>
+            <p class="lyric-line">Тронула душу, твоя мне мила, ламбада.</p>
+            <p class="lyric-line">Чтобы попой крутила, есть бит, не жаль саба,</p>
+            <p class="lyric-line">Я горю с тобой как шмаль, в пабах дай жара!</p>
+            <p class="lyric-line">Готов и я оформить всем вам лойс,</p>
+            <p class="lyric-line">Кто умеет делать шум — make some noise!</p>
+
+            <p class="lyric-line">Жара до утра в угаре толпа,</p>
+            <p class="lyric-line">Но я смотрю лишь на тебя лишь, веришь а?</p>
+            <p class="lyric-line">И когда станет клуб утром клевать носом,</p>
+            <p class="lyric-line">Я украду тебя будто Азор розу.</p>
+            <p class="lyric-line">Улыбнусь в тишине и скажу просто:</p>
+            <p class="lyric-line">Иди ко мне, Солнце, расплетай косы.</p>
+        </div>
+
+        <div class="lyrics-block" data-section="outro">
+            <div class="section-label">[Outro]</div>
+
+            <p class="lyric-line">Иди ко мне, Солнце, расплетай косы.</p>
+            <p class="lyric-line">Расплетай косы, расплетай косы.</p>
+            <p class="lyric-line english">(I got love... I got love...)</p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>© MiyaGi & Эндшпиль feat. Рем Дигга — I Got Love · Hajime Records</p>
+    </footer>
+
+    <!-- Audio Source (change the src to your audio file) -->
+    <audio id="audioPlayer" src="i-got-love.mp3"></audio>
+
+    <script>
+        // ============================================
+        // CONFIGURATION
+        // ============================================
+        const AUDIO_SRC = 'i-got-love.mp3'; // Change this to your audio file path
+
+        // ============================================
+        // DOM Elements
+        // ============================================
+        const audio = document.getElementById('audioPlayer');
+        const playBtn = document.getElementById('playBtn');
+        const playIcon = document.getElementById('playIcon');
+        const pauseIcon = document.getElementById('pauseIcon');
+        const progressBar = document.getElementById('progressBar');
+        const progressFill = document.getElementById('progressFill');
+        const currentTimeEl = document.getElementById('currentTime');
+        const totalTimeEl = document.getElementById('totalTime');
+        const volumeSlider = document.getElementById('volumeSlider');
+        const albumArt = document.getElementById('albumArt');
+        const visualizer = document.getElementById('visualizer');
+
+        // ============================================
+        // State
+        // ============================================
+        let isPlaying = false;
+        let audioContext = null;
+        let analyser = null;
+        let dataArray = null;
+        let animationId = null;
+        let previousVolume = 0.7;
+
+        // ============================================
+        // Initialize
+        // ============================================
+        function init() {
+            audio.src = AUDIO_SRC;
+            audio.volume = volumeSlider.value;
+            createVisualizerBars();
+            
+            audio.addEventListener('loadedmetadata', () => {
+                totalTimeEl.textContent = formatTime(audio.duration);
+            });
+
+            audio.addEventListener('timeupdate', updateProgress);
+            audio.addEventListener('ended', () => {
+                isPlaying = false;
+                updatePlayButton();
+                albumArt.classList.remove('spinning');
+            });
+
+            progressBar.addEventListener('click', seek);
+            volumeSlider.addEventListener('input', setVolume);
+
+            // Intersection Observer for lyrics
+            setupLyricsObserver();
+        }
+
+        // ============================================
+        // Player Controls
+        // ============================================
+        function togglePlay() {
+            if (isPlaying) {
+                audio.pause();
+                isPlaying = false;
+                stopVisualization();
+            } else {
+                initAudioContext();
+                audio.play();
+                isPlaying = true;
+                startVisualization();
+            }
+            updatePlayButton();
+            albumArt.classList.toggle('spinning', isPlaying);
+        }
+
+        function updatePlayButton() {
+            playIcon.style.display = isPlaying ? 'none' : 'block';
+            pauseIcon.style.display = isPlaying ? 'block' : 'none';
+        }
+
+        function skip(seconds) {
+            audio.currentTime = Math.max(0, Math.min(audio.duration, audio.currentTime + seconds));
+        }
+
+        function seek(e) {
+            const rect = progressBar.getBoundingClientRect();
+            const percent = (e.clientX - rect.left) / rect.width;
+            audio.currentTime = percent * audio.duration;
+        }
+
+        function setVolume() {
+            audio.volume = volumeSlider.value;
+            previousVolume = volumeSlider.value;
+        }
+
+        function toggleMute() {
+            if (audio.volume > 0) {
+                previousVolume = audio.volume;
+                audio.volume = 0;
+                volumeSlider.value = 0;
+            } else {
+                audio.volume = previousVolume;
+                volumeSlider.value = previousVolume;
+            }
+        }
+
+        // ============================================
+        // Progress & Time
+        // ============================================
+        function updateProgress() {
+            const percent = (audio.currentTime / audio.duration) * 100;
+            progressFill.style.width = percent + '%';
+            currentTimeEl.textContent = formatTime(audio.currentTime);
+        }
+
+        function formatTime(seconds) {
+            if (isNaN(seconds)) return '0:00';
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return mins + ':' + secs.toString().padStart(2, '0');
+        }
+
+        // ============================================
+        // Audio Context & Visualization
+        // ============================================
+        function initAudioContext() {
+            if (audioContext) return;
+            
+            try {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                analyser = audioContext.createAnalyser();
+                analyser.fftSize = 128;
+                
+                const source = audioContext.createMediaElementSource(audio);
+                source.connect(analyser);
+                analyser.connect(audioContext.destination);
+                
+                dataArray = new Uint8Array(analyser.frequencyBinCount);
+            } catch (e) {
+                console.log('Web Audio API not supported');
+            }
+        }
+
+        function createVisualizerBars() {
+            const barCount = 50;
+            visualizer.innerHTML = '';
+            for (let i = 0; i < barCount; i++) {
+                const bar = document.createElement('div');
+                bar.className = 'visualizer-bar';
+                bar.style.height = '5px';
+                visualizer.appendChild(bar);
+            }
+        }
+
+        function startVisualization() {
+            if (!analyser) return;
+            
+            function animate() {
+                if (!isPlaying) return;
+                
+                analyser.getByteFrequencyData(dataArray);
+                const bars = visualizer.querySelectorAll('.visualizer-bar');
+                
+                bars.forEach((bar, i) => {
+                    const value = dataArray[i] || 0;
+                    const height = Math.max(4, (value / 255) * 40);
+                    bar.style.height = height + 'px';
+                    bar.style.opacity = 0.4 + (value / 255) * 0.6;
+                });
+                
+                animationId = requestAnimationFrame(animate);
+            }
+            animate();
+        }
+
+        function stopVisualization() {
+            if (animationId) {
+                cancelAnimationFrame(animationId);
+            }
+            
+            // Idle animation
+            const bars = visualizer.querySelectorAll('.visualizer-bar');
+            bars.forEach((bar) => {
+                const randomHeight = 3 + Math.random() * 8;
+                bar.style.height = randomHeight + 'px';
+                bar.style.opacity = 0.3 + Math.random() * 0.3;
+            });
+        }
+
+        // ============================================
+        // Lyrics Intersection Observer
+        // ============================================
+        function setupLyricsObserver() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            });
+
+            document.querySelectorAll('.lyrics-block').forEach(block => {
+                observer.observe(block);
+            });
+        }
+
+        // ============================================
+        // Scroll Functions
+        // ============================================
+        function scrollToPlayer() {
+            document.getElementById('player').scrollIntoView({ 
+                behavior: 'smooth' 
+            });
+        }
+
+        // ============================================
+        // Initialize on load
+        // ============================================
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>
